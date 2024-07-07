@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Ecommerce</string>
+
+    <string name="g_the_right_address">The Right Address \n For Shopping \n Anyday</string>
+    <string name="g_best_quality">It is now very easy to reach the \n best quality among all the \n products on the internet!</string>
+
 </resources>
