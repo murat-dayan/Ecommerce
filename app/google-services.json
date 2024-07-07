@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "995440730567",
+    "project_id": "ecommerce-f83ec",
+    "storage_bucket": "ecommerce-f83ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995440730567:android:faf35b05c4bf8f75bfb9e2",
+        "android_client_info": {
+          "package_name": "com.muratdayan.ecommerce"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgfKyL3aYkzOjpSSucAQSQXmWyp31fbb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
