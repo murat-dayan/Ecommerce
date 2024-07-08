@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.muratdayan.ecommerce.R
-import com.muratdayan.ecommerce.data.model.User
+import com.muratdayan.ecommerce.domain.model.User
 import com.muratdayan.ecommerce.databinding.FragmentRegisterBinding
 import com.muratdayan.ecommerce.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,6 +61,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                         Log.d("test",result.data.toString())
                         binding.btnRegisterRegister.revertAnimation()
                     }
+                    else-> Unit
                 }
             }
         }

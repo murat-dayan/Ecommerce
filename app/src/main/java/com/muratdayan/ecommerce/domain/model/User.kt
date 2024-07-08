@@ -1,4 +1,4 @@
-package com.muratdayan.ecommerce.data.model
+package com.muratdayan.ecommerce.domain.model
 
 data class User(
     val firstName:String,
