@@ -11,8 +11,8 @@
         android:label="IntroductionFragment"
         tools:layout="@layout/fragment_introduction">
         <action
-            android:id="@+id/navigate_introductionFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            android:id="@+id/navigate_introductionFragment_to_accountOptionsFragment"
+            app:destination="@id/accountOptionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -33,5 +33,17 @@
         <action
             android:id="@+id/navigate_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/accountOptionsFragment"
+        android:name="com.muratdayan.ecommerce.presentation.login.AccountOptionsFragment"
+        android:label="AccountOptionsFragment"
+        tools:layout="@layout/fragment_account_options">
+        <action
+            android:id="@+id/navigate_accountOptionsFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/navigate_accountOptionsFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
     </fragment>
 </navigation>
