@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.FragmentLoginBinding
 import com.muratdayan.ecommerce.presentation.ShoppingActivity
+import com.muratdayan.ecommerce.presentation.dialog.setUpBottomSheetDialog
 import com.muratdayan.ecommerce.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -37,6 +38,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         binding.tvDontHaveAnAccount.setOnClickListener {
             findNavController().navigate(R.id.navigate_loginFragment_to_registerFragment)
+        }
+
+        binding.tvForgotPasswordLogin.setOnClickListener {
+            setUpBottomSheetDialog {email:String->
+
+            }
         }
 
         binding.apply {
