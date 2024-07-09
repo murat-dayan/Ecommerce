@@ -8,4 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRepository {
 
     fun createAccountWithEmailAndPassword(user:User,password:String) : Flow<Resource<FirebaseUser>>
+
+    fun signInWithEmailAndPassword(email:String,password:String) : Flow<Resource<FirebaseUser>>
+
 }

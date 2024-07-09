@@ -38,5 +38,24 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun signInWithEmailAndPassword(
+        email: String,
+        password: String
+    ): Flow<Resource<FirebaseUser>> = flow {
+        emit(Resource.Loading())
+        try {
+            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            result.user?.let { firebaseUser ->
+                emit(Resource.Success(firebaseUser))
+            }
+        }catch (e: FirebaseAuthInvalidCredentialsException) {
+            emit(Resource.Error("Invalid credentials"))
+        } catch (e: FirebaseAuthInvalidUserException) {
+            emit(Resource.Error("Invalid user"))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message.toString()))
+        }
+    }
+
 
 }
