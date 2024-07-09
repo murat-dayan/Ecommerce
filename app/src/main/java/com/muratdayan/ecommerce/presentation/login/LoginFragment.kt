@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.FragmentLoginBinding
 import com.muratdayan.ecommerce.presentation.ShoppingActivity
@@ -33,6 +34,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.tvDontHaveAnAccount.setOnClickListener {
+            findNavController().navigate(R.id.navigate_loginFragment_to_registerFragment)
+        }
 
         binding.apply {
             btnLoginLogin.setOnClickListener {

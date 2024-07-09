@@ -45,13 +45,13 @@
             />
 
         <TextView
-            android:id="@+id/tvDontHaveAnAccount"
+            android:id="@+id/tvDoYouHaveAccount"
             style="@style/h2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:gravity="center"
-            android:text="Don't Have An Account? Login"
+            android:text="Do you have account? Login"
             android:textAlignment="center"
             app:layout_constraintStart_toStartOf="@id/guidelineLoginLeft"
             app:layout_constraintTop_toBottomOf="@id/tvLetsRegister"
@@ -64,7 +64,7 @@
             android:layout_height="@dimen/editTextHeight"
             app:layout_constraintStart_toStartOf="@id/guidelineLoginLeft"
             app:layout_constraintEnd_toEndOf="@id/guidelineLoginRight"
-            app:layout_constraintTop_toBottomOf="@id/tvDontHaveAnAccount"
+            app:layout_constraintTop_toBottomOf="@id/tvDoYouHaveAccount"
             style="@style/editText"
             android:hint="First Name"
             android:inputType="text"

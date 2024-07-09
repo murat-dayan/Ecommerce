@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.domain.model.User
 import com.muratdayan.ecommerce.databinding.FragmentRegisterBinding
@@ -37,6 +38,10 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.tvDoYouHaveAccount.setOnClickListener {
+            findNavController().navigate(R.id.navigate_registerFragment_to_loginFragment)
+        }
 
         binding.apply {
             btnRegisterRegister.setOnClickListener {
