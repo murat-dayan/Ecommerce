@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,6 +23,7 @@ class LoginViewModel @Inject constructor(
     val login = _login.asSharedFlow()
 
     fun signInWithEmailAndPassword(email: String, password: String) {
+        viewModelScope.launch { _login.emit(Resource.Loading()) }
         loginUseCase(email, password).onEach { result ->
             when(result){
                 is Resource.Error -> {
