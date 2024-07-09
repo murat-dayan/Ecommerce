@@ -3,6 +3,8 @@ package com.muratdayan.ecommerce.presentation.register
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.muratdayan.ecommerce.core.Constants.USER_COLLECTION
 import com.muratdayan.ecommerce.domain.model.User
 import com.muratdayan.ecommerce.domain.usecase.RegisterUseCase
 import com.muratdayan.ecommerce.util.RegisterFieldState
@@ -22,11 +24,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: RegisterUseCase,
+    private val dbFirestore: FirebaseFirestore
 ) : ViewModel() {
 
-    private val _register = MutableStateFlow<Resource<FirebaseUser>>(Resource.Unspecified())
-    val register: Flow<Resource<FirebaseUser>> = _register
+    private val _register = MutableStateFlow<Resource<User>>(Resource.Unspecified())
+    val register: Flow<Resource<User>> = _register
 
     private val _validation = Channel<RegisterFieldState>()
     val validation = _validation.receiveAsFlow()
@@ -49,7 +52,8 @@ class RegisterViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         result.data?.let {
-                            _register.emit(Resource.Success(result.data))
+                            saveUserInfo(result.data.uid, user=user)
+//
                         }
                     }
 
@@ -65,6 +69,16 @@ class RegisterViewModel @Inject constructor(
                 _validation.send(registerFieldState)
             }
         }
+    }
+
+    private fun saveUserInfo(userUid: String, user: User) {
+        dbFirestore.collection(USER_COLLECTION).document(userUid).set(user)
+            .addOnSuccessListener {
+                _register.value = Resource.Success(user)
+            }
+            .addOnFailureListener {exception->
+                _register.value = Resource.Error(exception.message.toString())
+            }
     }
 
     private fun checkValidation(user: User, password: String) :Boolean {
