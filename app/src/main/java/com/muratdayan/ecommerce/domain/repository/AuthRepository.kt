@@ -11,4 +11,6 @@ interface AuthRepository {
 
     fun signInWithEmailAndPassword(email:String,password:String) : Flow<Resource<FirebaseUser>>
 
+    fun resetPassword(email: String) : Flow<Resource<String>>
+
 }
