@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/introductionFragment"
-        android:name="com.muratdayan.ecommerce.presentation.login.IntroductionFragment"
+        android:name="com.muratdayan.ecommerce.presentation.introduction.IntroductionFragment"
         android:label="IntroductionFragment"
         tools:layout="@layout/fragment_introduction">
         <action

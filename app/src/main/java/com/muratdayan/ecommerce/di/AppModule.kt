@@ -1,8 +1,11 @@
 package com.muratdayan.ecommerce.di
 
+import android.app.Application
+import android.content.Context.MODE_PRIVATE
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.muratdayan.ecommerce.core.Constants.INTRODUCTION_SP
 import com.muratdayan.ecommerce.data.repository.AuthRepositoryImpl
 import com.muratdayan.ecommerce.domain.repository.AuthRepository
 import com.muratdayan.ecommerce.domain.usecase.RegisterUseCase
@@ -31,5 +34,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseFirestoreDatabase() = Firebase.firestore
+
+    @Provides
+    fun provideIntroductionSP(
+        application: Application
+    ) = application.getSharedPreferences(INTRODUCTION_SP, MODE_PRIVATE)
 
 }
