@@ -1,4 +1,4 @@
-package com.muratdayan.ecommerce.presentation
+package com.muratdayan.ecommerce.presentation.shopping
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

@@ -1,4 +1,4 @@
-package com.muratdayan.ecommerce.presentation.login
+package com.muratdayan.ecommerce.presentation.auth.login
 
 import android.os.Bundle
 import android.view.LayoutInflater

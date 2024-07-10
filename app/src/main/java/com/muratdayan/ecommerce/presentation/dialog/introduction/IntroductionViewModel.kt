@@ -1,4 +1,4 @@
-package com.muratdayan.ecommerce.presentation.introduction
+package com.muratdayan.ecommerce.presentation.dialog.introduction
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel

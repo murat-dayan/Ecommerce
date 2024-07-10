@@ -1,4 +1,4 @@
-package com.muratdayan.ecommerce.presentation.register
+package com.muratdayan.ecommerce.presentation.auth.register
 
 import android.os.Bundle
 import android.util.Log

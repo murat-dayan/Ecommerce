@@ -1,4 +1,4 @@
-package com.muratdayan.ecommerce.presentation.introduction
+package com.muratdayan.ecommerce.presentation.dialog.introduction
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,10 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.FragmentIntroductionBinding
-import com.muratdayan.ecommerce.presentation.ShoppingActivity
-import com.muratdayan.ecommerce.presentation.introduction.IntroductionViewModel.Companion.SHOPPING_ACTIVITY
+import com.muratdayan.ecommerce.presentation.shopping.ShoppingActivity
+import com.muratdayan.ecommerce.presentation.dialog.introduction.IntroductionViewModel.Companion.SHOPPING_ACTIVITY
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint

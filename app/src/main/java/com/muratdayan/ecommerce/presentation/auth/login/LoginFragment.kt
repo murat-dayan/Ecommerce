@@ -1,4 +1,4 @@
-package com.muratdayan.ecommerce.presentation.login
+package com.muratdayan.ecommerce.presentation.auth.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.FragmentLoginBinding
-import com.muratdayan.ecommerce.presentation.ShoppingActivity
+import com.muratdayan.ecommerce.presentation.shopping.ShoppingActivity
 import com.muratdayan.ecommerce.presentation.dialog.setUpBottomSheetDialog
 import com.muratdayan.ecommerce.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,7 +84,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     }
                     is Resource.Success ->{
                         binding.btnLoginLogin.revertAnimation()
-                        Intent(requireActivity(),ShoppingActivity::class.java).also {intent->
+                        Intent(requireActivity(), ShoppingActivity::class.java).also { intent->
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)
                         }
