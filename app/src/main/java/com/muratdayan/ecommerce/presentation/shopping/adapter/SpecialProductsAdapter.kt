@@ -53,6 +53,8 @@ class SpecialProductsAdapter : RecyclerView.Adapter<SpecialProductsAdapter.Speci
     override fun onBindViewHolder(holder: SpecialProductsViewHolder, position: Int) {
         val product = differ.currentList[position]
 
+        holder.bind(product)
+
 
     }
 

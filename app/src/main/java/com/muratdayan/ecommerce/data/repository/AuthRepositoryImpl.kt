@@ -5,6 +5,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.muratdayan.ecommerce.domain.model.Product
 import com.muratdayan.ecommerce.domain.model.User
 import com.muratdayan.ecommerce.domain.repository.AuthRepository
 import com.muratdayan.ecommerce.util.Resource
@@ -14,7 +16,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firestore:FirebaseFirestore
 ) : AuthRepository {
     override fun createAccountWithEmailAndPassword(
         user: User,
@@ -66,6 +69,21 @@ class AuthRepositoryImpl @Inject constructor(
             emit(Resource.Error(e.message.toString()))
         }
     }
+
+    override fun fetchProductsByCategoryName(categoryName: String): Flow<Resource<List<Product>>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                val products = firestore.collection("Products")
+                    .whereEqualTo("category", categoryName)
+                    .get()
+                    .await()
+
+                emit(Resource.Success(products.toObjects(Product::class.java)))
+            }catch (e: Exception) {
+                emit(Resource.Error(e.message.toString()))
+            }
+        }
 
 
 }

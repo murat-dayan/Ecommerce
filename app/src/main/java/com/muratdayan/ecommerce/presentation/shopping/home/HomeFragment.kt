@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.tabs.TabLayoutMediator
-import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.FragmentHomeBinding
 import com.muratdayan.ecommerce.presentation.shopping.adapter.HomeViewpagerAdapter
 import com.muratdayan.ecommerce.presentation.shopping.categories.AccessoryFragment
 import com.muratdayan.ecommerce.presentation.shopping.categories.ChairFragment
 import com.muratdayan.ecommerce.presentation.shopping.categories.CupboardFragment
 import com.muratdayan.ecommerce.presentation.shopping.categories.FurnitureFragment
-import com.muratdayan.ecommerce.presentation.shopping.categories.MainCategoryFragment
+import com.muratdayan.ecommerce.presentation.shopping.categories.main.MainCategoryFragment
 import com.muratdayan.ecommerce.presentation.shopping.categories.TableFragment
 
 

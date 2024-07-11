@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.shopping.categories.MainCategoryFragment">
+    tools:context=".presentation.shopping.categories.main.MainCategoryFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -16,10 +16,11 @@
             android:layout_height="match_parent">
 
             <ProgressBar
+                android:id="@+id/mainCategoryProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:indeterminateTint="@color/g_gray700"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

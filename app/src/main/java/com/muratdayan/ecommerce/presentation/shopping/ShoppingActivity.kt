@@ -10,7 +10,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.play.integrity.internal.f
 import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.ActivityShoppingBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ShoppingActivity : AppCompatActivity() {
 
     val binding by lazy {
