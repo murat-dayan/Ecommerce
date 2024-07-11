@@ -85,5 +85,18 @@ class AuthRepositoryImpl @Inject constructor(
             }
         }
 
+    override fun getAllProducts(): Flow<Resource<List<Product>>> = flow {
+        emit(Resource.Loading())
+
+        try {
+            val products = firestore.collection("Products")
+                .get()
+                .await()
+            emit(Resource.Success(products.toObjects(Product::class.java)))
+        }catch (e:Exception){
+            emit(Resource.Error(e.message.toString()))
+        }
+    }
+
 
 }

@@ -9,8 +9,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.muratdayan.ecommerce.databinding.FragmentMainCategoryBinding
+import com.muratdayan.ecommerce.presentation.shopping.adapter.BestDealsAdapter
+import com.muratdayan.ecommerce.presentation.shopping.adapter.BestProductsAdapter
 import com.muratdayan.ecommerce.presentation.shopping.adapter.SpecialProductsAdapter
 import com.muratdayan.ecommerce.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,13 +27,15 @@ class MainCategoryFragment : Fragment() {
     private var _binding: FragmentMainCategoryBinding? = null
     private val binding get() = _binding!!
     private lateinit var specialProductsAdapter: SpecialProductsAdapter
+    private lateinit var bestDealsAdapter: BestDealsAdapter
+    private lateinit var bestProductsAdapter: BestProductsAdapter
     private val mainCategoryViewModel: MainCategoryViewModel by viewModels()
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View{
         _binding = FragmentMainCategoryBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -39,6 +44,28 @@ class MainCategoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpSpecialProductsRv()
+        setUpBestDealsProductsRv()
+        setUpBestProductsRv()
+
+        lifecycleScope.launch {
+            mainCategoryViewModel.bestDealsProducts.collect{
+                when(it){
+                    is Resource.Loading -> {
+                        showLoading()
+                    }
+                    is Resource.Success -> {
+                        bestDealsAdapter.differ.submitList(it.data)
+                        hideLoading()
+                    }
+                    is Resource.Error -> {
+                        hideLoading()
+                        Log.e(TAG, it.message.toString())
+                        Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                    else -> Unit
+                }
+            }
+        }
 
         lifecycleScope.launch {
             mainCategoryViewModel.specialProducts.collect{
@@ -58,6 +85,42 @@ class MainCategoryFragment : Fragment() {
                     else -> Unit
                 }
             }
+        }
+
+        lifecycleScope.launch {
+            mainCategoryViewModel.bestProducts.collect{
+                when(it){
+                    is Resource.Loading -> {
+                        showLoading()
+                    }
+                    is Resource.Success -> {
+                        bestProductsAdapter.differ.submitList(it.data)
+                        hideLoading()
+                    }
+                    is Resource.Error -> {
+                        hideLoading()
+                        Log.e(TAG, it.message.toString())
+                        Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    private fun setUpBestProductsRv() {
+        bestProductsAdapter = BestProductsAdapter()
+        binding.rvBestProducts.apply {
+            layoutManager = GridLayoutManager(requireContext(),2,GridLayoutManager.VERTICAL,false)
+            adapter = bestProductsAdapter
+        }
+    }
+
+    private fun setUpBestDealsProductsRv() {
+        bestDealsAdapter = BestDealsAdapter()
+        binding.rvBestDealsProducts.apply {
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            adapter = bestDealsAdapter
         }
     }
 

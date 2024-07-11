@@ -16,4 +16,6 @@ interface AuthRepository {
 
     fun fetchProductsByCategoryName(categoryName:String) : Flow<Resource<List<Product>>>
 
+    fun getAllProducts(): Flow<Resource<List<Product>>>
+
 }

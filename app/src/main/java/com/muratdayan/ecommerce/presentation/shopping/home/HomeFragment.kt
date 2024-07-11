@@ -41,6 +41,8 @@ class HomeFragment : Fragment() {
             FurnitureFragment()
         )
 
+        binding.viewpagerHome.isUserInputEnabled = false
+
         val viewpager2Adapter = HomeViewpagerAdapter(categoriesFragment,childFragmentManager,lifecycle)
         binding.viewpagerHome.adapter = viewpager2Adapter
 
