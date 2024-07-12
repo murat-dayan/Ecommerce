@@ -83,9 +83,6 @@ class MainCategoryViewModel @Inject constructor(
 
      fun fetchBestProducts(){
 
-        viewModelScope.launch {
-            _bestProducts.emit(Resource.Loading())
-        }
         getAllProductsUseCase().onEach { resource ->
             when(resource){
                 is Resource.Loading -> {

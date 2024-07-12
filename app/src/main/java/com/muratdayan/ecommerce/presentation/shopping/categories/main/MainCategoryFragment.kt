@@ -92,16 +92,16 @@ class MainCategoryFragment : Fragment() {
             mainCategoryViewModel.bestProducts.collect{
                 when(it){
                     is Resource.Loading -> {
-                        showLoading()
+                        binding.bestProductsProgressBar.visibility = View.VISIBLE
                     }
                     is Resource.Success -> {
                         bestProductsAdapter.differ.submitList(it.data)
-                        hideLoading()
+                        binding.bestProductsProgressBar.visibility = View.GONE
                     }
                     is Resource.Error -> {
-                        hideLoading()
                         Log.e(TAG, it.message.toString())
                         Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
+                        binding.bestProductsProgressBar.visibility = View.GONE
                     }
                     else -> Unit
                 }

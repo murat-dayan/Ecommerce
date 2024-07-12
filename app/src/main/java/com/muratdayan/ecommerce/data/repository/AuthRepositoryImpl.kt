@@ -89,24 +89,32 @@ class AuthRepositoryImpl @Inject constructor(
         }
 
     override fun getAllProducts(): Flow<Resource<List<Product>>> = flow {
-        emit(Resource.Loading())
+        if (!pagingInfo.isPagingEnd){
+            emit(Resource.Loading())
 
-        try {
-            val products = firestore.collection("Products")
-                .limit(pagingInfo.page*10)
-                .get()
-                .await()
-            emit(Resource.Success(products.toObjects(Product::class.java)))
+            try {
+                val products = firestore.collection("Products")
+                    .limit(pagingInfo.bestProductsPage*10)
+                    .get()
+                    .await()
+                    .toObjects(Product::class.java)
+                pagingInfo.isPagingEnd = products == pagingInfo.oldBestProducts
+                pagingInfo.oldBestProducts = products
 
-            pagingInfo.page++
-        }catch (e:Exception){
-            emit(Resource.Error(e.message.toString()))
+                emit(Resource.Success(products))
+
+                pagingInfo.bestProductsPage++
+            }catch (e:Exception){
+                emit(Resource.Error(e.message.toString()))
+            }
         }
     }
 }
 
 internal data class PagingInfo(
-    var page:Long=1
+    var bestProductsPage:Long=1,
+    var oldBestProducts: List<Product> = emptyList(),
+    var isPagingEnd : Boolean = false
 ){
 
 }
