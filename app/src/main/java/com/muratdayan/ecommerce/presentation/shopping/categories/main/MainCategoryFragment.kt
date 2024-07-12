@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -106,6 +107,13 @@ class MainCategoryFragment : Fragment() {
                 }
             }
         }
+
+        binding.nestedSVMainCategory.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener{ v, _, scrollY, _, _ ->
+            if (v.getChildAt(0).bottom <= v.height + scrollY){
+                mainCategoryViewModel.fetchBestProducts()
+            }
+        })
+
     }
 
     private fun setUpBestProductsRv() {

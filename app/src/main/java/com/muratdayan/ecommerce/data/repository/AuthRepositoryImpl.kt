@@ -19,6 +19,9 @@ class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore:FirebaseFirestore
 ) : AuthRepository {
+
+    private val pagingInfo = PagingInfo()
+
     override fun createAccountWithEmailAndPassword(
         user: User,
         password: String
@@ -90,13 +93,21 @@ class AuthRepositoryImpl @Inject constructor(
 
         try {
             val products = firestore.collection("Products")
+                .limit(pagingInfo.page*10)
                 .get()
                 .await()
             emit(Resource.Success(products.toObjects(Product::class.java)))
+
+            pagingInfo.page++
         }catch (e:Exception){
             emit(Resource.Error(e.message.toString()))
         }
     }
+}
 
+internal data class PagingInfo(
+    var page:Long=1
+){
 
 }
+

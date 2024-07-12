@@ -81,7 +81,7 @@ class MainCategoryViewModel @Inject constructor(
     }
 
 
-    private fun fetchBestProducts(){
+     fun fetchBestProducts(){
 
         viewModelScope.launch {
             _bestProducts.emit(Resource.Loading())

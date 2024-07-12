@@ -7,6 +7,7 @@
     tools:context=".presentation.shopping.categories.main.MainCategoryFragment">
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedSVMainCategory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
