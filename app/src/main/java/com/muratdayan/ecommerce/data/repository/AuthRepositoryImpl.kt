@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firestore:FirebaseFirestore
+    private val firestore: FirebaseFirestore
 ) : AuthRepository {
 
     private val pagingInfo = PagingInfo()
@@ -54,7 +54,7 @@ class AuthRepositoryImpl @Inject constructor(
             result.user?.let { firebaseUser ->
                 emit(Resource.Success(firebaseUser))
             }
-        }catch (e: FirebaseAuthInvalidCredentialsException) {
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
             emit(Resource.Error("Invalid credentials"))
         } catch (e: FirebaseAuthInvalidUserException) {
             emit(Resource.Error("Invalid user"))
@@ -83,18 +83,18 @@ class AuthRepositoryImpl @Inject constructor(
                     .await()
 
                 emit(Resource.Success(products.toObjects(Product::class.java)))
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 emit(Resource.Error(e.message.toString()))
             }
         }
 
     override fun getAllProducts(): Flow<Resource<List<Product>>> = flow {
-        if (!pagingInfo.isPagingEnd){
+        if (!pagingInfo.isPagingEnd) {
             emit(Resource.Loading())
 
             try {
                 val products = firestore.collection("Products")
-                    .limit(pagingInfo.bestProductsPage*10)
+                    .limit(pagingInfo.bestProductsPage * 10)
                     .get()
                     .await()
                     .toObjects(Product::class.java)
@@ -104,18 +104,35 @@ class AuthRepositoryImpl @Inject constructor(
                 emit(Resource.Success(products))
 
                 pagingInfo.bestProductsPage++
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 emit(Resource.Error(e.message.toString()))
             }
+        }
+    }
+
+    override fun fetchOfferProducts(categoryName: String): Flow<Resource<List<Product>>> = flow {
+        emit(Resource.Loading())
+
+        try {
+            val products = firestore.collection("Products")
+                .whereEqualTo("category", categoryName)
+                .whereNotEqualTo("offerPercentage",null)
+                .get()
+                .await()
+                .toObjects(Product::class.java)
+
+            emit(Resource.Success(products))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message.toString()))
         }
     }
 }
 
 internal data class PagingInfo(
-    var bestProductsPage:Long=1,
+    var bestProductsPage: Long = 1,
     var oldBestProducts: List<Product> = emptyList(),
-    var isPagingEnd : Boolean = false
-){
+    var isPagingEnd: Boolean = false
+) {
 
 }
 
