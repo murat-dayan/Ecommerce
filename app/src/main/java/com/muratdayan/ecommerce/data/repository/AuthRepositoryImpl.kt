@@ -5,22 +5,37 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.muratdayan.ecommerce.core.FirebaseCommon
+import com.muratdayan.ecommerce.domain.model.CartProduct
 import com.muratdayan.ecommerce.domain.model.Product
 import com.muratdayan.ecommerce.domain.model.User
 import com.muratdayan.ecommerce.domain.repository.AuthRepository
 import com.muratdayan.ecommerce.util.Resource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val firebaseCommon: FirebaseCommon
 ) : AuthRepository {
 
     private val pagingInfo = PagingInfo()
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun createAccountWithEmailAndPassword(
         user: User,
@@ -116,7 +131,7 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             val products = firestore.collection("Products")
                 .whereEqualTo("category", categoryName)
-                .whereNotEqualTo("offerPercentage",null)
+                .whereNotEqualTo("offerPercentage", null)
                 .get()
                 .await()
                 .toObjects(Product::class.java)
@@ -126,13 +141,92 @@ class AuthRepositoryImpl @Inject constructor(
             emit(Resource.Error(e.message.toString()))
         }
     }
-}
 
-internal data class PagingInfo(
-    var bestProductsPage: Long = 1,
-    var oldBestProducts: List<Product> = emptyList(),
-    var isPagingEnd: Boolean = false
-) {
+    override fun addUpdateCartProduct(cartProduct: CartProduct): Flow<Resource<CartProduct>> = channelFlow {
+        send(Resource.Loading())
 
+        try {
+            val documents = suspendCancellableCoroutine<List<DocumentSnapshot>> { continuation ->
+                firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
+                    .whereNotEqualTo("product.id", cartProduct.product.id).get()
+                    .addOnSuccessListener {
+                        continuation.resume(it.documents)
+                    }
+                    .addOnFailureListener {
+                        continuation.resumeWithException(it)
+                    }
+            }
+
+            if (documents.isEmpty()) {
+                addNewProduct(cartProduct).collect { result ->
+                    send(result)
+                }
+            } else {
+                val product = documents.first().toObject(CartProduct::class.java)
+                if (product == cartProduct) {
+                    val documentId = documents.first().id
+                    increaseQuantity(documentId, cartProduct).collect { result ->
+                        send(result)
+                    }
+                } else {
+                    addNewProduct(cartProduct).collect { result ->
+                        send(result)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            send(Resource.Error(e.message.toString()))
+        }
+    }
+
+    override fun addNewProduct(cartProduct: CartProduct): Flow<Resource<CartProduct>> = channelFlow {
+        try {
+            suspendCancellableCoroutine<Unit> { continuation ->
+                firebaseCommon.addProductToCart(cartProduct) { addedProduct, e ->
+                    scope.launch {
+                        if (e == null) {
+                            send(Resource.Success(addedProduct!!))
+                            continuation.resume(Unit)
+                        } else {
+                            send(Resource.Error(e.message.toString()))
+                            continuation.resume(Unit)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            send(Resource.Error(e.message.toString()))
+        }
+    }
+
+    override fun increaseQuantity(documentId: String, cartProduct: CartProduct): Flow<Resource<CartProduct>> = channelFlow {
+        try {
+            suspendCancellableCoroutine<Unit> { continuation ->
+                firebaseCommon.increaseQuantity(documentId) { _, exception ->
+                    scope.launch {
+                        if (exception == null) {
+                            send(Resource.Success(cartProduct))
+                            continuation.resume(Unit)
+                        } else {
+                            send(Resource.Error(exception.message.toString()))
+                            continuation.resume(Unit)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            send(Resource.Error(e.message.toString()))
+        }
+    }
+
+
+    internal data class PagingInfo(
+        var bestProductsPage: Long = 1,
+        var oldBestProducts: List<Product> = emptyList(),
+        var isPagingEnd: Boolean = false
+    ) {
+
+
+    }
 }
 

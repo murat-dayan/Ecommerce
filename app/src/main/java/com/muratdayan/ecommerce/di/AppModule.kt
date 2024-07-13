@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.muratdayan.ecommerce.core.Constants.INTRODUCTION_SP
+import com.muratdayan.ecommerce.core.FirebaseCommon
 import com.muratdayan.ecommerce.data.repository.AuthRepositoryImpl
 import com.muratdayan.ecommerce.domain.repository.AuthRepository
 import com.muratdayan.ecommerce.domain.usecase.RegisterUseCase
@@ -30,7 +31,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(firebaseAuth: FirebaseAuth,firestore: FirebaseFirestore): AuthRepository = AuthRepositoryImpl(firebaseAuth, firestore)
+    fun provideFirebaseCommon(
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ) = FirebaseCommon(firebaseAuth, firestore)
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(firebaseAuth: FirebaseAuth,firestore: FirebaseFirestore, firebaseCommon: FirebaseCommon): AuthRepository = AuthRepositoryImpl(firebaseAuth, firestore, firebaseCommon)
 
     @Provides
     @Singleton
@@ -42,5 +50,7 @@ object AppModule {
     fun provideIntroductionSP(
         application: Application
     ) = application.getSharedPreferences(INTRODUCTION_SP, MODE_PRIVATE)
+
+
 
 }
