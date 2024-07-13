@@ -10,6 +10,7 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:src="#B8D9FA"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -25,10 +26,12 @@
         />
     
     <ImageView
+        android:id="@+id/ivPickedIcon"
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:src="@drawable/ic_picked"
         app:tint="@color/white"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@id/imageCircleColor"
         app:layout_constraintTop_toTopOf="@id/imageCircleColor"
         app:layout_constraintBottom_toBottomOf="@id/imageCircleColor"
