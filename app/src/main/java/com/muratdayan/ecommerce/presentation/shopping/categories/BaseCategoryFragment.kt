@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.NestedScrollView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.FragmentBaseCategoryBinding
 import com.muratdayan.ecommerce.presentation.shopping.adapter.BestProductsAdapter
+import com.muratdayan.ecommerce.util.showBottomNavView
 
 open class BaseCategoryFragment : Fragment() {
 
@@ -34,6 +36,16 @@ open class BaseCategoryFragment : Fragment() {
 
         setUpOfferRV()
         setUpBestProductsRV()
+
+        bestProductsAdapter.onClick = {product ->
+            val b = Bundle().apply { putParcelable("product",product) }
+            findNavController().navigate(R.id.navigate_homeFragment_to_productDetailFragment, b)
+        }
+
+        offerAdapter.onClick = {product ->
+            val b = Bundle().apply { putParcelable("product",product) }
+            findNavController().navigate(R.id.navigate_homeFragment_to_productDetailFragment, b)
+        }
 
         binding.rvOffer.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -96,6 +108,11 @@ open class BaseCategoryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showBottomNavView()
     }
 
 

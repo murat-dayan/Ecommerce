@@ -55,8 +55,10 @@ class SpecialProductsAdapter : RecyclerView.Adapter<SpecialProductsAdapter.Speci
 
         holder.bind(product)
 
-
+        holder.itemView.setOnClickListener {
+            onClick?.invoke(product)
+        }
     }
 
-
+    var onClick: ((Product) -> Unit)? = null
 }

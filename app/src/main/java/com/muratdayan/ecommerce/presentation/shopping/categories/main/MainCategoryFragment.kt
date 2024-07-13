@@ -10,13 +10,16 @@ import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.muratdayan.ecommerce.R
 import com.muratdayan.ecommerce.databinding.FragmentMainCategoryBinding
 import com.muratdayan.ecommerce.presentation.shopping.adapter.BestDealsAdapter
 import com.muratdayan.ecommerce.presentation.shopping.adapter.BestProductsAdapter
 import com.muratdayan.ecommerce.presentation.shopping.adapter.SpecialProductsAdapter
 import com.muratdayan.ecommerce.util.Resource
+import com.muratdayan.ecommerce.util.showBottomNavView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -47,6 +50,22 @@ class MainCategoryFragment : Fragment() {
         setUpSpecialProductsRv()
         setUpBestDealsProductsRv()
         setUpBestProductsRv()
+
+        specialProductsAdapter.onClick = {product ->  
+            val b = Bundle().apply { putParcelable("product",product) }
+            findNavController().navigate(R.id.navigate_homeFragment_to_productDetailFragment, b)
+        }
+
+        bestDealsAdapter.onClick = {product ->
+            val b = Bundle().apply { putParcelable("product",product) }
+            findNavController().navigate(R.id.navigate_homeFragment_to_productDetailFragment, b)
+        }
+
+        bestProductsAdapter.onClick = {product ->
+            val b = Bundle().apply { putParcelable("product",product) }
+            findNavController().navigate(R.id.navigate_homeFragment_to_productDetailFragment, b)
+        }
+
 
         lifecycleScope.launch {
             mainCategoryViewModel.bestDealsProducts.collect{
@@ -152,6 +171,11 @@ class MainCategoryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showBottomNavView()
     }
 
 
