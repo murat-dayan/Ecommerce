@@ -15,16 +15,6 @@ interface AuthRepository {
 
     fun resetPassword(email: String) : Flow<Resource<String>>
 
-    fun fetchProductsByCategoryName(categoryName:String) : Flow<Resource<List<Product>>>
 
-    fun getAllProducts(): Flow<Resource<List<Product>>>
-
-    fun fetchOfferProducts(categoryName: String): Flow<Resource<List<Product>>>
-
-    fun addUpdateCartProduct(cartProduct: CartProduct): Flow<Resource<CartProduct>>
-
-    fun addNewProduct(cartProduct: CartProduct) : Flow<Resource<CartProduct>>
-
-    fun increaseQuantity(documentId:String,cartProduct: CartProduct) : Flow<Resource<CartProduct>>
 
 }

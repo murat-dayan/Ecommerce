@@ -9,6 +9,7 @@ import com.google.firebase.ktx.Firebase
 import com.muratdayan.ecommerce.core.Constants.INTRODUCTION_SP
 import com.muratdayan.ecommerce.core.FirebaseCommon
 import com.muratdayan.ecommerce.data.repository.AuthRepositoryImpl
+import com.muratdayan.ecommerce.data.repository.ShoppingRepositoryImpl
 import com.muratdayan.ecommerce.domain.repository.AuthRepository
 import com.muratdayan.ecommerce.domain.usecase.RegisterUseCase
 import dagger.Module
@@ -39,6 +40,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAuthRepository(firebaseAuth: FirebaseAuth,firestore: FirebaseFirestore, firebaseCommon: FirebaseCommon): AuthRepository = AuthRepositoryImpl(firebaseAuth, firestore, firebaseCommon)
+
+    @Provides
+    @Singleton
+    fun provideShoppingRepository(firebaseAuth: FirebaseAuth,firestore: FirebaseFirestore, firebaseCommon: FirebaseCommon) = ShoppingRepositoryImpl(firebaseAuth, firestore, firebaseCommon)
 
     @Provides
     @Singleton
