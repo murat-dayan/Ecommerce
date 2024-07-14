@@ -1,5 +1,6 @@
 package com.muratdayan.ecommerce.data.repository
 
+import androidx.core.app.PendingIntentCompat.send
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,6 +12,8 @@ import com.muratdayan.ecommerce.util.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -29,6 +32,10 @@ class ShoppingRepositoryImpl @Inject constructor(
     private val pagingInfo = PagingInfo()
 
     private val scope = CoroutineScope(Dispatchers.IO)
+
+    private val _cartProducts = MutableStateFlow<Resource<List<CartProduct>>>(Resource.Unspecified())
+    val cartProducts = _cartProducts.asStateFlow()
+    private var cartProductsDocuments = emptyList<DocumentSnapshot>()
 
     override fun fetchProductsByCategoryName(categoryName: String): Flow<Resource<List<Product>>> =
         flow {
@@ -165,17 +172,57 @@ class ShoppingRepositoryImpl @Inject constructor(
         emit(Resource.Loading())
 
         try {
-            firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
+            val value = firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
                 .get()
                 .await()
-                .toObjects(CartProduct::class.java)
-                .let {
-                    emit(Resource.Success(it))
-                }
+            cartProductsDocuments = value.documents
+            val cartProducts = value.toObjects(CartProduct::class.java)
+            emit(Resource.Success(cartProducts))
+            scope.launch { Resource.Success(cartProducts) }
+
         }catch (e: Exception) {
             emit(Resource.Error(e.message.toString()))
         }
     }
+
+    override fun changeQuantity(
+        cartProduct: CartProduct,
+        quantityChanging: FirebaseCommon.QuantityChanging
+    ): Flow<Resource<List<CartProduct>>> = channelFlow {
+        try {
+            suspendCancellableCoroutine<Unit> {continuation->
+                val index = cartProducts.value.data?.indexOf(cartProduct)
+                if (index != null && index != -1) {
+                    val documentId = cartProductsDocuments[index].id
+                    when (quantityChanging) {
+                        FirebaseCommon.QuantityChanging.INCREASE -> {
+                            firebaseCommon.increaseQuantity(documentId) { result, exception ->
+                                if (exception != null) {
+                                    scope.launch {
+                                        send(Resource.Error(exception.message.toString()))
+                                    }
+                                }
+                            }
+                        }
+                        FirebaseCommon.QuantityChanging.DECREASE -> {
+                            firebaseCommon.decreaseQuantity(documentId){result, exception->
+                                if (exception != null) {
+                                    scope.launch {
+                                        send(Resource.Error(exception.message.toString()))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }catch (e: Exception) {
+            send(Resource.Error(e.message.toString()))
+        }
+    }
+
+
 
 
     internal data class PagingInfo(
