@@ -23,53 +23,20 @@ class DetailViewModel @Inject constructor(
 
 
     fun addUpdateProductCart(cartProduct: CartProduct){
-        addToCartUseCase.addUpdateCartProduct(cartProduct).onEach {result->
-            when(result){
-                is Resource.Loading -> {
-                    _addToCart.emit(Resource.Loading())
-                }
-                is Resource.Success -> {
-                    _addToCart.emit(Resource.Success(result.data!!))
-                }
-                is Resource.Error -> {
-                    _addToCart.emit(Resource.Error(result.message.toString()))
-                }
-                else -> Unit
-            }
+        addToCartUseCase.addUpdateCartProduct(cartProduct).onEach {
+            _addToCart.emit(it)
         }.launchIn(viewModelScope)
     }
 
     fun addNewProduct(cartProduct: CartProduct){
-        addToCartUseCase.addNewProduct(cartProduct).onEach {result->
-            when(result){
-                is Resource.Loading -> {
-                    _addToCart.emit(Resource.Loading())
-                }
-                is Resource.Success -> {
-                    _addToCart.emit(Resource.Success(result.data!!))
-                }
-                is Resource.Error -> {
-                    _addToCart.emit(Resource.Error(result.message.toString()))
-                }
-                else -> Unit
-            }
+        addToCartUseCase.addNewProduct(cartProduct).onEach {
+            _addToCart.emit(it)
         }.launchIn(viewModelScope)
     }
 
     fun increaseQuantity(documentId:String,cartProduct: CartProduct){
-        addToCartUseCase.increaseQuantity(documentId,cartProduct).onEach {result->
-            when(result){
-                is Resource.Loading -> {
-                    _addToCart.emit(Resource.Loading())
-                }
-                is Resource.Success -> {
-                    _addToCart.emit(Resource.Success(result.data!!))
-                }
-                is Resource.Error -> {
-                    _addToCart.emit(Resource.Error(result.message.toString()))
-                }
-                else -> Unit
-            }
+        addToCartUseCase.increaseQuantity(documentId,cartProduct).onEach {
+            _addToCart.emit(it)
         }.launchIn(viewModelScope)
     }
 
