@@ -1,6 +1,5 @@
 package com.muratdayan.ecommerce.data.repository
 
-import androidx.core.app.PendingIntentCompat.send
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,13 +26,14 @@ class ShoppingRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
     private val firebaseCommon: FirebaseCommon
-): ShoppingRepository {
+) : ShoppingRepository {
 
     private val pagingInfo = PagingInfo()
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val _cartProducts = MutableStateFlow<Resource<List<CartProduct>>>(Resource.Unspecified())
+    private val _cartProducts =
+        MutableStateFlow<Resource<List<CartProduct>>>(Resource.Unspecified())
     val cartProducts = _cartProducts.asStateFlow()
     private var cartProductsDocuments = emptyList<DocumentSnapshot>()
 
@@ -91,64 +91,70 @@ class ShoppingRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun addUpdateCartProduct(cartProduct: CartProduct): Flow<Resource<CartProduct>> = channelFlow {
-        send(Resource.Loading())
+    override fun addUpdateCartProduct(cartProduct: CartProduct): Flow<Resource<CartProduct>> =
+        channelFlow {
+            send(Resource.Loading())
 
-        try {
-            val documents = suspendCancellableCoroutine<List<DocumentSnapshot>> { continuation ->
-                firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
-                    .whereNotEqualTo("product.id", cartProduct.product.id).get()
-                    .addOnSuccessListener {
-                        continuation.resume(it.documents)
+            try {
+                val documents =
+                    suspendCancellableCoroutine<List<DocumentSnapshot>> { continuation ->
+                        firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
+                            .whereNotEqualTo("product.id", cartProduct.product.id).get()
+                            .addOnSuccessListener {
+                                continuation.resume(it.documents)
+                            }
+                            .addOnFailureListener {
+                                continuation.resumeWithException(it)
+                            }
                     }
-                    .addOnFailureListener {
-                        continuation.resumeWithException(it)
-                    }
-            }
 
-            if (documents.isEmpty()) {
-                addNewProduct(cartProduct).collect { result ->
-                    send(result)
-                }
-            } else {
-                val product = documents.first().toObject(CartProduct::class.java)
-                if (product == cartProduct) {
-                    val documentId = documents.first().id
-                    increaseQuantity(documentId, cartProduct).collect { result ->
-                        send(result)
-                    }
-                } else {
+                if (documents.isEmpty()) {
                     addNewProduct(cartProduct).collect { result ->
                         send(result)
                     }
-                }
-            }
-        } catch (e: Exception) {
-            send(Resource.Error(e.message.toString()))
-        }
-    }
-
-    override fun addNewProduct(cartProduct: CartProduct): Flow<Resource<CartProduct>> = channelFlow {
-        try {
-            suspendCancellableCoroutine<Unit> { continuation ->
-                firebaseCommon.addProductToCart(cartProduct) { addedProduct, e ->
-                    scope.launch {
-                        if (e == null) {
-                            send(Resource.Success(addedProduct!!))
-                            continuation.resume(Unit)
-                        } else {
-                            send(Resource.Error(e.message.toString()))
-                            continuation.resume(Unit)
+                } else {
+                    val product = documents.first().toObject(CartProduct::class.java)
+                    if (product == cartProduct) {
+                        val documentId = documents.first().id
+                        increaseQuantity(documentId, cartProduct).collect { result ->
+                            send(result)
+                        }
+                    } else {
+                        addNewProduct(cartProduct).collect { result ->
+                            send(result)
                         }
                     }
                 }
+            } catch (e: Exception) {
+                send(Resource.Error(e.message.toString()))
             }
-        } catch (e: Exception) {
-            send(Resource.Error(e.message.toString()))
         }
-    }
 
-    override fun increaseQuantity(documentId: String, cartProduct: CartProduct): Flow<Resource<CartProduct>> = channelFlow {
+    override fun addNewProduct(cartProduct: CartProduct): Flow<Resource<CartProduct>> =
+        channelFlow {
+            try {
+                suspendCancellableCoroutine<Unit> { continuation ->
+                    firebaseCommon.addProductToCart(cartProduct) { addedProduct, e ->
+                        scope.launch {
+                            if (e == null) {
+                                send(Resource.Success(addedProduct!!))
+                                continuation.resume(Unit)
+                            } else {
+                                send(Resource.Error(e.message.toString()))
+                                continuation.resume(Unit)
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                send(Resource.Error(e.message.toString()))
+            }
+        }
+
+    override fun increaseQuantity(
+        documentId: String,
+        cartProduct: CartProduct
+    ): Flow<Resource<CartProduct>> = channelFlow {
         try {
             suspendCancellableCoroutine<Unit> { continuation ->
                 firebaseCommon.increaseQuantity(documentId) { _, exception ->
@@ -168,20 +174,28 @@ class ShoppingRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getCartProducts(): Flow<Resource<List<CartProduct>>> = flow {
-        emit(Resource.Loading())
-
+    override fun getCartProducts(): Flow<Resource<List<CartProduct>>> = channelFlow {
         try {
-            val value = firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
-                .get()
-                .await()
-            cartProductsDocuments = value.documents
-            val cartProducts = value.toObjects(CartProduct::class.java)
-            emit(Resource.Success(cartProducts))
-            scope.launch { Resource.Success(cartProducts) }
+            suspendCancellableCoroutine<Unit> { continuation ->
+                firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
+                    .addSnapshotListener { value, error ->
 
-        }catch (e: Exception) {
-            emit(Resource.Error(e.message.toString()))
+                        if (error != null || value == null) {
+                            scope.launch {
+                                send(Resource.Error(error?.message.toString()))
+                            }
+                        }else{
+                            cartProductsDocuments = value.documents
+                            val cartProducts = value.toObjects(CartProduct::class.java)
+                            scope.launch {
+                                send(Resource.Success(cartProducts))
+                            }
+                        }
+
+                    }
+            }
+        } catch (e: Exception) {
+            send(Resource.Error(e.message.toString()))
         }
     }
 
@@ -190,7 +204,7 @@ class ShoppingRepositoryImpl @Inject constructor(
         quantityChanging: FirebaseCommon.QuantityChanging
     ): Flow<Resource<List<CartProduct>>> = channelFlow {
         try {
-            suspendCancellableCoroutine<Unit> {continuation->
+            suspendCancellableCoroutine<Unit> { continuation ->
                 val index = cartProducts.value.data?.indexOf(cartProduct)
                 if (index != null && index != -1) {
                     val documentId = cartProductsDocuments[index].id
@@ -204,8 +218,9 @@ class ShoppingRepositoryImpl @Inject constructor(
                                 }
                             }
                         }
+
                         FirebaseCommon.QuantityChanging.DECREASE -> {
-                            firebaseCommon.decreaseQuantity(documentId){result, exception->
+                            firebaseCommon.decreaseQuantity(documentId) { result, exception ->
                                 if (exception != null) {
                                     scope.launch {
                                         send(Resource.Error(exception.message.toString()))
@@ -217,12 +232,10 @@ class ShoppingRepositoryImpl @Inject constructor(
                 }
             }
 
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             send(Resource.Error(e.message.toString()))
         }
     }
-
-
 
 
     internal data class PagingInfo(

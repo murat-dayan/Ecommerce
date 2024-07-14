@@ -11,6 +11,7 @@ import com.muratdayan.ecommerce.core.FirebaseCommon
 import com.muratdayan.ecommerce.data.repository.AuthRepositoryImpl
 import com.muratdayan.ecommerce.data.repository.ShoppingRepositoryImpl
 import com.muratdayan.ecommerce.domain.repository.AuthRepository
+import com.muratdayan.ecommerce.domain.repository.ShoppingRepository
 import com.muratdayan.ecommerce.domain.usecase.RegisterUseCase
 import dagger.Module
 import dagger.Provides
@@ -43,7 +44,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideShoppingRepository(firebaseAuth: FirebaseAuth,firestore: FirebaseFirestore, firebaseCommon: FirebaseCommon) = ShoppingRepositoryImpl(firebaseAuth, firestore, firebaseCommon)
+    fun provideShoppingRepository(firebaseAuth: FirebaseAuth,firestore: FirebaseFirestore, firebaseCommon: FirebaseCommon): ShoppingRepository = ShoppingRepositoryImpl(firebaseAuth, firestore, firebaseCommon)
 
     @Provides
     @Singleton

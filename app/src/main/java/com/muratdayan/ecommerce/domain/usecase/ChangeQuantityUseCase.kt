@@ -7,9 +7,7 @@ import javax.inject.Inject
 
 class ChangeQuantityUseCase @Inject constructor(
     private val shoppingRepository: ShoppingRepository
-
 ) {
     operator fun invoke(cartProduct: CartProduct, quantityChanging: FirebaseCommon.QuantityChanging) =
         shoppingRepository.changeQuantity(cartProduct, quantityChanging)
-
 }

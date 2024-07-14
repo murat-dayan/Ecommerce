@@ -1,7 +1,6 @@
 package com.muratdayan.ecommerce.presentation.shopping.adapter
 
 import android.annotation.SuppressLint
-import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.muratdayan.ecommerce.databinding.ProductRvItemBinding
 import com.muratdayan.ecommerce.domain.model.Product
+import com.muratdayan.ecommerce.helper.getProductPrice
 
 class BestProductsAdapter : RecyclerView.Adapter<BestProductsAdapter.BestProductsViewHolder>() {
 
@@ -18,16 +18,13 @@ class BestProductsAdapter : RecyclerView.Adapter<BestProductsAdapter.BestProduct
         RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n", "DefaultLocale")
-        fun bind(product: Product){
+        fun bind(product: Product) {
             binding.apply {
                 Glide.with(itemView).load(product.images[0]).into(imgProduct)
                 tvName.text = product.name
-                product.offerPercentage?.let {
-                    val remainingPricePercentage = 1f - it
-                    val priceAfterOffer = product.price * remainingPricePercentage
-                    tvNewPrice.text = "$${String.format("%.2f", priceAfterOffer)}"
-                }
-                if (product.offerPercentage != null){
+                val priceAfterOffer = product.offerPercentage.getProductPrice(product.price)
+                tvNewPrice.text = "$${String.format("%.2f", priceAfterOffer)}"
+                if (product.offerPercentage != null) {
                     tvPrice.visibility = View.INVISIBLE
                 }
                 tvPrice.text = "$${String.format("%.2f", product.price)}"
@@ -35,17 +32,17 @@ class BestProductsAdapter : RecyclerView.Adapter<BestProductsAdapter.BestProduct
         }
     }
 
-    private val diffCallback = object : DiffUtil.ItemCallback<Product>(){
+    private val diffCallback = object : DiffUtil.ItemCallback<Product>() {
         override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
             return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return  oldItem == newItem
+            return oldItem == newItem
         }
     }
 
-    val differ = AsyncListDiffer(this,diffCallback)
+    val differ = AsyncListDiffer(this, diffCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BestProductsViewHolder {
         return BestProductsViewHolder(
