@@ -1,5 +1,6 @@
 package com.muratdayan.ecommerce.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -189,6 +190,7 @@ class ShoppingRepositoryImpl @Inject constructor(
                             val cartProducts = value.toObjects(CartProduct::class.java)
                             scope.launch {
                                 send(Resource.Success(cartProducts))
+                                _cartProducts.value = Resource.Success(cartProducts)
                             }
                         }
 
@@ -210,6 +212,7 @@ class ShoppingRepositoryImpl @Inject constructor(
                     val documentId = cartProductsDocuments[index].id
                     when (quantityChanging) {
                         FirebaseCommon.QuantityChanging.INCREASE -> {
+                            scope.launch { send(Resource.Loading()) }
                             firebaseCommon.increaseQuantity(documentId) { result, exception ->
                                 if (exception != null) {
                                     scope.launch {
@@ -220,6 +223,7 @@ class ShoppingRepositoryImpl @Inject constructor(
                         }
 
                         FirebaseCommon.QuantityChanging.DECREASE -> {
+                            scope.launch { send(Resource.Loading()) }
                             firebaseCommon.decreaseQuantity(documentId) { result, exception ->
                                 if (exception != null) {
                                     scope.launch {
@@ -233,6 +237,7 @@ class ShoppingRepositoryImpl @Inject constructor(
             }
 
         } catch (e: Exception) {
+            Log.e("ShoppingRepository", e.message.toString())
             send(Resource.Error(e.message.toString()))
         }
     }

@@ -9,9 +9,11 @@ import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.muratdayan.ecommerce.R
+import com.muratdayan.ecommerce.core.FirebaseCommon
 import com.muratdayan.ecommerce.databinding.FragmentCartBinding
 import com.muratdayan.ecommerce.presentation.shopping.adapter.CartProductAdapter
 import com.muratdayan.ecommerce.util.Resource
@@ -43,6 +45,16 @@ class CartFragment : Fragment() {
 
         setUpCartRv()
 
+
+
+        lifecycleScope.launch {
+            cartViewModel.productsPrice.collectLatest { price->
+                price?.let {
+                    binding.tvTotalPrice.text = "$${String.format("%.2f", it)}"
+                }
+            }
+        }
+
         lifecycleScope.launch {
             cartViewModel.cartProducts.collectLatest {result ->
                 when(result){
@@ -67,6 +79,18 @@ class CartFragment : Fragment() {
                     else -> Unit
                 }
             }
+        }
+
+        cartAdapter.onProductClick ={cartProduct ->
+            val b = Bundle().apply { putParcelable("product",cartProduct.product) }
+            findNavController().navigate(R.id.navigate_cartFragment_to_productDetailFragment,b)
+        }
+
+        cartAdapter.onPlusClick ={cartProduct ->
+            cartViewModel.changeQuantity(cartProduct, FirebaseCommon.QuantityChanging.INCREASE)
+        }
+        cartAdapter.onMinusClick ={cartProduct ->
+            cartViewModel.changeQuantity(cartProduct, FirebaseCommon.QuantityChanging.DECREASE)
         }
 
     }

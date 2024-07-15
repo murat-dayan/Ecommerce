@@ -75,6 +75,10 @@ class CartProductAdapter : RecyclerView.Adapter<CartProductAdapter.CartProductVi
 
         holder.bind(cartProduct)
 
+        holder.itemView.setOnClickListener {
+            onProductClick?.invoke(cartProduct)
+        }
+
         holder.binding.ivPlus.setOnClickListener {
             onPlusClick?.invoke(cartProduct)
         }
