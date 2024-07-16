@@ -26,4 +26,6 @@ interface ShoppingRepository {
         cartProduct: CartProduct,
         quantityChanging: FirebaseCommon.QuantityChanging
     ): Flow<Resource<List<CartProduct>>>
+
+    fun deleteCartProduct(cartProduct: CartProduct)
 }

@@ -223,11 +223,23 @@ class ShoppingRepositoryImpl @Inject constructor(
                         }
 
                         FirebaseCommon.QuantityChanging.DECREASE -> {
-                            scope.launch { send(Resource.Loading()) }
-                            firebaseCommon.decreaseQuantity(documentId) { result, exception ->
-                                if (exception != null) {
-                                    scope.launch {
-                                        send(Resource.Error(exception.message.toString()))
+                            if (cartProduct.quantity == 1) {
+                                // Ürün miktarı 1 olduğunda doğrudan boş liste göndermek yerine
+                                // Ürün miktarını azaltma işlemini doğrudan yapabilirsiniz
+                                scope.launch {
+                                    send(Resource.Success(emptyList()))
+                                }
+                                return@suspendCancellableCoroutine
+                            } else {
+                                scope.launch { send(Resource.Loading()) }
+                                firebaseCommon.decreaseQuantity(documentId) { result, exception ->
+                                    if (exception != null) {
+                                        scope.launch {
+                                            send(Resource.Error(exception.message.toString()))
+                                        }
+                                    } else {
+                                        // Güncellenmiş listeyi gönderin
+                                        scope.launch { send(Resource.Success(updatedCartProducts())) }
                                     }
                                 }
                             }
@@ -239,6 +251,19 @@ class ShoppingRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e("ShoppingRepository", e.message.toString())
             send(Resource.Error(e.message.toString()))
+        }
+    }
+
+    private fun updatedCartProducts(): List<CartProduct> {
+        return cartProducts.value.data ?: emptyList()
+    }
+
+    override fun deleteCartProduct(cartProduct: CartProduct) {
+        val index = cartProducts.value.data?.indexOf(cartProduct)
+        if (index != null && index != -1) {
+            val documentId = cartProductsDocuments[index].id
+            firestore.collection("user").document(firebaseAuth.uid!!).collection("cart")
+                .document(documentId).delete()
         }
     }
 

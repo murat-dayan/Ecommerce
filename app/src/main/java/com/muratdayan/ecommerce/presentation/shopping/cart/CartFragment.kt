@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +18,6 @@ import com.muratdayan.ecommerce.databinding.FragmentCartBinding
 import com.muratdayan.ecommerce.presentation.shopping.adapter.CartProductAdapter
 import com.muratdayan.ecommerce.util.Resource
 import com.muratdayan.ecommerce.util.VerticalItemDecoration
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -44,6 +43,7 @@ class CartFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpCartRv()
+
 
 
 
@@ -91,6 +91,23 @@ class CartFragment : Fragment() {
         }
         cartAdapter.onMinusClick ={cartProduct ->
             cartViewModel.changeQuantity(cartProduct, FirebaseCommon.QuantityChanging.DECREASE)
+        }
+
+        lifecycleScope.launch {
+            cartViewModel.deleteDialog.collectLatest {
+                val alertDialog = AlertDialog.Builder(requireContext()).apply {
+                    setTitle("Delete item from cart")
+                    setMessage("Do you want to delete this item from cart?")
+                    setPositiveButton("Yes") { dialog, _ ->
+                        cartViewModel.deleteCartProduct(it)
+                        dialog.dismiss()
+                    }
+                    setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                }
+                alertDialog.create().show()
+            }
         }
 
     }
